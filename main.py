@@ -19,7 +19,11 @@ def estimate(case):
     logs = [math.log(x) for x in recent]
     drift = 0.0
     if len(logs) >= 4:
-        drift = max(-0.08, min(0.08, (logs[-1]-logs[0])/max(1, len(logs)-1)))
+        slope = (logs[-1] - logs[0]) / max(1, len(logs) - 1)
+        drift = max(-0.08, min(0.08, slope))
+    # Recent launches usually have more uncertainty than a smooth historical path.
+    if len(recent) >= 2:
+        drift += max(-0.025, min(0.025, (math.log(recent[-1]) - math.log(recent[-2])) * 0.25))
     vol = 0.15
     if len(logs) > 3:
         mean = sum(logs)/len(logs)
